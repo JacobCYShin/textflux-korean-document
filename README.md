@@ -128,12 +128,41 @@ python -m unittest discover -s tests
 
 ## 관련 저장소
 
-| 저장소 | 내용 |
-| --- | --- |
-| `textflux-airgap-source` | TextFlux 소스 이식본. 고정 커밋 `c791924acc4a93d48021c3731a75fada805cc501` |
-| `textflux-airgap-runtime` | 런타임 컨테이너 이미지 구성 |
+세 저장소가 각각 다른 역할을 한다. **모델 가중치는 어디에도 없다.**
+
+| 저장소 | 역할 | 규모 |
+| --- | --- | --- |
+| [`textflux-airgap-source`](https://github.com/JacobCYShin/textflux-airgap-source) | 상류 TextFlux 트리를 고정 커밋으로 떠놓은 스냅샷. 상류가 수정한 `diffusers` 포함. 상류에 접근할 수 없을 때의 fallback | 약 1,800개 파일 |
+| [`textflux-airgap-runtime`](https://github.com/JacobCYShin/textflux-airgap-runtime) | 추론 이미지 빌드 자산. Dockerfile, 고정 의존성, 로컬 경로 러너, 준비 스크립트 | 12개 파일 |
+| **이 저장소** | 측정 도구와 측정 기록 | 약 37개 파일 |
+
+```text
+textflux-airgap-source              상류 트리, 커밋 c791924… 고정
+        │
+        │   fetch_textflux_source.sh
+        │   상류를 먼저 시도하고, 실패하면 이 스냅샷으로
+        ▼
+textflux-airgap-runtime             Dockerfile COPY → 실행 가능한 이미지
+        │
+        │   이 이미지를 벤치마크가 실행한다
+        ▼
+이 저장소                            측정 · 판독 · 결과 기록
+```
+
+스냅샷에는 상류 히스토리가 없다. 해당 커밋 시점의 파일 트리이고, 고정값은
+`UPSTREAM_REVISION` 파일에 기록되어 있다. fallback 시 커밋 체크아웃이 불가능하므로
+fetch 스크립트가 그 파일을 검증한다.
+
+체크포인트는 `assembly/scripts/download_models.py`가 별도로 받아 Git 밖에 둔다.
+
+- `black-forest-labs/FLUX.1-Fill-dev@358293da0354175698b67ec8299acf928313a78a`
+- `yyyyyxie/textflux@8930419673bacf8716eb54a79632a5ec5a8b9862`
 
 `docs/pipeline.md`와 `docs/decision-log.md`의 코드 참조는 위 고정 커밋 기준이다.
+
+**처음 보는 사람의 읽는 순서: 이 저장소 → runtime → source.**
+이 저장소에서 무엇을 측정했고 무엇을 안 했는지 파악하고, 실행 환경을 다시 만들어야 할 때
+runtime을, 코드 동작을 파고들 때 source를 본다.
 
 ---
 
