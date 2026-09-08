@@ -1,0 +1,42 @@
+TextFlux Korean Document Measurement
+====================================
+
+This repository contains two kinds of content, kept in separate directories.
+
+Original work
+-------------
+Everything except vendor/ is original work by the maintainers of this
+repository, licensed under Apache-2.0. See LICENSE.
+
+  docs/       measurement records, pipeline description, parameter rationale
+  scripts/    measurement and review tooling
+  cases/      test manifests
+  examples/   synthetic demo form and masks
+  results/    measurement evidence
+  runtime/    container image assembly, dependency pins, local-path runner
+
+Vendored third-party work
+-------------------------
+vendor/textflux/ is a snapshot of the upstream TextFlux project:
+
+  https://github.com/yyyyyxie/textflux
+  commit c791924acc4a93d48021c3731a75fada805cc501
+  recorded in vendor/textflux/UPSTREAM_REVISION
+
+It is included verbatim, with checkpoints and evaluation weights excluded.
+The snapshot carries no upstream git history; it is the file tree at that
+commit. Its own license and attribution files are preserved in place:
+
+  vendor/textflux/LICENSE          upstream Apache-2.0
+  vendor/textflux/LICENSE-MODEL    FLUX.1-dev model license
+  vendor/textflux/NOTICE           upstream provenance and modifications
+
+vendor/textflux/diffusers/ is a modified diffusers tree shipped by upstream.
+It is required by TextFlux and cannot be replaced with a PyPI release.
+
+Model weights
+-------------
+No model weights are contained in this repository. FLUX.1-Fill-dev and the
+TextFlux checkpoint are obtained separately by
+runtime/scripts/download_models.py and stored in a workspace directory outside
+version control. Their licenses and access terms are set by their providers.

@@ -1,0 +1,19 @@
+TextFlux Source Snapshot
+
+Upstream source:
+  https://github.com/yyyyyxie/textflux
+  revision c791924acc4a93d48021c3731a75fada805cc501
+
+This repository is a deployment-oriented source snapshot derived from the
+upstream source listed above. It is not an official release of TextFlux and
+does not claim endorsement by the upstream authors.
+
+Modifications to the pinned upstream tree are limited to repository
+documentation and policy files, plus the removal of the following evaluation
+OCR checkpoints:
+
+  eval/ocr_weights/ppv3_rec.pth
+  eval/ocr_weights/ppv3_rec_en.pth
+
+The upstream license files are retained without modification. Checkpoints,
+model weights, and other separately distributed artifacts are not included.

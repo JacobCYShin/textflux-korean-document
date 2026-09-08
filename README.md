@@ -45,13 +45,17 @@ TextFlux 프로젝트의 공식 배포물이 아니며, 독립적으로 만든 �
 
 | 순서 | 문서 | 답하는 질문 |
 | --- | --- | --- |
-| 1 | [docs/pipeline.md](docs/pipeline.md) | 이 모델은 무엇을 받아 무엇을 하는가 |
-| 2 | [docs/findings.md](docs/findings.md) | 무엇을 측정했고 결과가 어땠는가 |
-| 3 | [docs/decision-log.md](docs/decision-log.md) | 파라미터가 왜 그 값인가, 어디서 막혔는가 |
-| 4 | [docs/reproduce.md](docs/reproduce.md) | 어떻게 다시 돌리는가 |
+| 1 | [docs/getting-started.md](docs/getting-started.md) | **추론을 한 번 돌려보려면** · 저장소와 워크스페이스는 무엇이 다른가 |
+| 2 | [docs/pipeline.md](docs/pipeline.md) | 이 모델은 무엇을 받아 무엇을 하는가 |
+| 3 | [docs/findings.md](docs/findings.md) | 무엇을 측정했고 결과가 어땠는가 |
+| 4 | [docs/decision-log.md](docs/decision-log.md) | 파라미터가 왜 그 값인가, 어디서 막혔는가 |
+| 5 | [docs/reproduce.md](docs/reproduce.md) | 측정을 어떻게 다시 돌리는가 |
 
-**처음 보는 사람은 1번부터 읽는다.** 파이프라인 구조를 모르면 나머지 세 문서의 근거를 해석할 수 없다.
-파라미터를 바꿀 계획이라면 3번을 반드시 읽는다 — 값의 출처가 거기에만 있다.
+**손을 대볼 사람은 1번, 결과를 알고 싶은 사람은 3번부터 읽는다.**
+2번을 모르면 3·4번의 근거를 해석할 수 없다.
+파라미터를 바꿀 계획이라면 4번을 반드시 읽는다 — 값의 출처가 거기에만 있다.
+
+이전 구조(저장소 3개)에서 넘어오는 경우 [docs/migration.md](docs/migration.md)를 따른다.
 
 보조 문서:
 
@@ -66,6 +70,7 @@ TextFlux 프로젝트의 공식 배포물이 아니며, 독립적으로 만든 �
 ## 저장소 구조
 
 ```text
+docs/                      측정 기록과 절차 문서
 scripts/
   make_field_masks.py      문구의 잉크 종횡비를 재서 마스크 폭을 맞춘다
   make_crop_inputs.py      필드 주변을 잘라 확대한 입력을 만든다
@@ -88,7 +93,19 @@ examples/demo-inputs/      합성 서식지 1장 + 필드 마스크 4개. 모든
 results/                   측정 증거 이미지
 tests/                     스크립트 스모크 테스트
 config/                    환경 변수 예시
+
+runtime/                   추론 이미지 빌드 자산
+  Dockerfile               빌드 컨텍스트는 저장소 루트
+  offline_infer.py         상류의 허브 참조를 로컬 경로로 대체하는 러너
+  requirements-runtime.txt 추론 의존성 (버전 고정)
+  scripts/                 모델 다운로드 · payload 검증 · 빌드 · 오프라인 스모크
+
+vendor/textflux/           상류 TextFlux 코드 스냅샷 (커밋 c791924…)
+                           상류가 수정한 diffusers 트리 포함. 직접 수정하지 않는다
 ```
+
+**모델 가중치·실행 결과·서식지는 이 저장소에 없다.** 워크스페이스에 둔다.
+경계와 판정 기준은 [docs/getting-started.md](docs/getting-started.md#새로-만든-산출물은-어디에-두는가)에 있다.
 
 ---
 
@@ -126,43 +143,33 @@ python -m unittest discover -s tests
 
 ---
 
-## 관련 저장소
+## 이전 저장소
 
-세 저장소가 각각 다른 역할을 한다. **모델 가중치는 어디에도 없다.**
+이 저장소는 원래 셋으로 나뉘어 있었다. 하나로 합쳤고, 이전 것들은 아카이브했다.
 
-| 저장소 | 역할 | 규모 |
-| --- | --- | --- |
-| [`textflux-airgap-source`](https://github.com/JacobCYShin/textflux-airgap-source) | 상류 TextFlux 트리를 고정 커밋으로 떠놓은 스냅샷. 상류가 수정한 `diffusers` 포함. 상류에 접근할 수 없을 때의 fallback | 약 1,800개 파일 |
-| [`textflux-airgap-runtime`](https://github.com/JacobCYShin/textflux-airgap-runtime) | 추론 이미지 빌드 자산. Dockerfile, 고정 의존성, 로컬 경로 러너, 준비 스크립트 | 12개 파일 |
-| **이 저장소** | 측정 도구와 측정 기록 | 약 37개 파일 |
+| 이전 저장소 | 현재 위치 |
+| --- | --- |
+| `textflux-airgap-runtime` | `runtime/` |
+| `textflux-airgap-source` | `vendor/textflux/` |
+| `textflux-korean-document-benchmark` | 이 저장소 루트 |
 
-```text
-textflux-airgap-source              상류 트리, 커밋 c791924… 고정
-        │
-        │   fetch_textflux_source.sh
-        │   상류를 먼저 시도하고, 실패하면 이 스냅샷으로
-        ▼
-textflux-airgap-runtime             Dockerfile COPY → 실행 가능한 이미지
-        │
-        │   이 이미지를 벤치마크가 실행한다
-        ▼
-이 저장소                            측정 · 판독 · 결과 기록
-```
+합친 이유는 셋 중 어느 것도 독립적으로 소비되거나 버전이 매겨지지 않았고,
+`runtime`의 Dockerfile이 `source`의 디렉터리를 필요로 하는 **암묵적 의존**이 있어
+저장소 하나만 클론해서는 빌드가 되지 않았기 때문이다.
+지금은 `COPY vendor/textflux/`가 저장소 내부 경로이므로 클론 하나로 빌드된다.
 
-스냅샷에는 상류 히스토리가 없다. 해당 커밋 시점의 파일 트리이고, 고정값은
-`UPSTREAM_REVISION` 파일에 기록되어 있다. fallback 시 커밋 체크아웃이 불가능하므로
-fetch 스크립트가 그 파일을 검증한다.
+기존 클론에서 넘어오려면 [docs/migration.md](docs/migration.md)를 따른다.
 
-체크포인트는 `assembly/scripts/download_models.py`가 별도로 받아 Git 밖에 둔다.
+## 모델 가중치
+
+세 저장소 어디에도 없었고 지금도 없다. `runtime/scripts/download_models.py`가
+받아 워크스페이스에 둔다.
 
 - `black-forest-labs/FLUX.1-Fill-dev@358293da0354175698b67ec8299acf928313a78a`
 - `yyyyyxie/textflux@8930419673bacf8716eb54a79632a5ec5a8b9862`
 
-`docs/pipeline.md`와 `docs/decision-log.md`의 코드 참조는 위 고정 커밋 기준이다.
-
-**처음 보는 사람의 읽는 순서: 이 저장소 → runtime → source.**
-이 저장소에서 무엇을 측정했고 무엇을 안 했는지 파악하고, 실행 환경을 다시 만들어야 할 때
-runtime을, 코드 동작을 파고들 때 source를 본다.
+`docs/pipeline.md`와 `docs/decision-log.md`의 코드 참조는
+`vendor/textflux/UPSTREAM_REVISION`에 기록된 커밋 기준이다.
 
 ---
 
@@ -188,5 +195,9 @@ runtime을, 코드 동작을 파고들 때 source를 본다.
 
 ## 라이선스
 
-Apache-2.0. `LICENSE` 참조.
-이 저장소는 평가 도구와 측정 기록만 담으며, 모델 가중치나 그 라이선스를 포함하지 않는다.
+`vendor/`를 제외한 모든 내용은 Apache-2.0이다. `LICENSE` 참조.
+
+`vendor/textflux/`는 상류 TextFlux의 스냅샷이며 자체 라이선스 파일을 그대로 보존한다
+(`LICENSE`, `LICENSE-MODEL`, `NOTICE`). 구분과 출처는 루트 [NOTICE](NOTICE)에 정리했다.
+
+모델 가중치는 이 저장소에 없으며, 그 라이선스와 접근 조건은 배포처가 정한다.

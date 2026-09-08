@@ -9,9 +9,12 @@
 
 ## 0. 전제
 
+환경이 아직 구축되지 않았다면 [getting-started.md](getting-started.md)를 먼저 따른다.
+이 문서는 추론 1회가 이미 성공한 상태를 전제한다.
+
 | 항목 | 내용 |
 | --- | --- |
-| 런타임 | TextFlux 소스와 diffusers가 설치된 컨테이너 이미지. 구성은 `textflux-airgap-runtime` 참조 |
+| 런타임 | TextFlux 소스와 diffusers가 설치된 컨테이너 이미지. 구성은 `runtime/` 참조 |
 | 모델 | `flux-fill-dev/`(diffusers 형식, T5 포함)와 `textflux/` 체크포인트 |
 | 폰트 | 한글 글리프를 가진 OTF/TTF. 측정에는 Noto Sans CJK KR Regular 사용 |
 | GPU | bf16 파이프라인 약 32 GiB. 병렬 실행 시 GPU당 그만큼 |
@@ -27,12 +30,15 @@
 ## 1. 환경 변수
 
 ```bash
-export BENCH=/path/to/textflux-korean-document-benchmark
-export INPUTS=/path/to/private-inputs          # 서식지·마스크. Git 밖에 둔다
-export OUTPUT=/path/to/output-root             # runs/ 가 생길 위치
-export FONT=/path/to/NotoSansCJKkr-Regular.otf
-export IMAGE=textflux-offline:2026-08-25       # 런타임 이미지 태그
+export BENCH=/path/to/textflux-korean-document   # 저장소 체크아웃
+export WORKSPACE=/path/to/workspace              # 머신 상태
+export INPUTS="$WORKSPACE/private-inputs"        # 서식지·마스크
+export OUTPUT="$WORKSPACE"                       # runs/ 가 생길 위치
+export FONT="$WORKSPACE/fonts/NotoSansCJKkr-Regular.otf"
+export IMAGE=textflux-offline:2026-08-25         # 런타임 이미지 태그
 ```
+
+저장소와 워크스페이스를 나누는 이유는 [getting-started.md](getting-started.md#먼저-이해할-것--저장소와-워크스페이스는-다르다)에 있다.
 
 `config/benchmark.env.example`을 복사해 쓸 수도 있다.
 셸을 새로 열면 다시 설정해야 한다 — 변수가 비어 있으면 경로가 잘린 채 실행되어

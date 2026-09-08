@@ -1,0 +1,13 @@
+# Runtime-only dependencies for the TextFlux offline image.
+# PyTorch and torchvision are supplied by the CUDA-enabled base image.
+accelerate==0.33.0
+einops==0.8.0
+huggingface-hub==0.24.6
+invisible-watermark==0.2.0
+numpy==1.26.4
+opencv-python-headless==4.10.0.84
+Pillow==10.4.0
+protobuf==3.20.3
+safetensors==0.4.4
+sentencepiece==0.2.0
+transformers==4.43.3

@@ -1,8 +1,21 @@
-# Private source documents, masks, and generated outputs
+# Machine state. These may appear here when the repository is checked out
+# inside a workspace directory; they are never committed.
+payload/
+deliverable/
 private-inputs/
-cases/manifest.jsonl
 runs/
 reviews/
+logs/
+.hf-cache/
+.bootstrap/
+
+# Generated manifests and masks
+cases/manifest.jsonl
+cases/*-fit.jsonl
+cases/*-crop.jsonl
+cases/*-crop-meta.json
+cases/sweep-*.jsonl
+cases/sweep-*-meta.json
 
 # Python artifacts
 __pycache__/

@@ -1,0 +1,28 @@
+# The build context is the repository root. Only runtime/ and vendor/textflux/
+# are copied into the image; everything else is excluded so the context stays
+# small and no measurement data can leak into an image layer.
+
+# Workspace directories, when the repository is checked out inside one
+payload/
+deliverable/
+private-inputs/
+runs/
+reviews/
+logs/
+.hf-cache/
+.bootstrap/
+
+# Repository content the image does not need
+docs/
+scripts/
+cases/
+examples/
+results/
+tests/
+config/
+.git/
+*.md
+
+# Vendored tree: drop history and caches, keep the source
+vendor/textflux/.git/
+vendor/textflux/**/__pycache__/
