@@ -64,8 +64,8 @@ cat ~/textflux-layout-before.txt
 네트워크가 되는 머신에서 히스토리째 하나의 파일로 묶는다.
 
 ```bash
-git clone https://github.com/JacobCYShin/textflux-korean-document-benchmark
-cd textflux-korean-document-benchmark
+git clone https://github.com/JacobCYShin/textflux-korean-document
+cd textflux-korean-document
 git bundle create ~/textflux-repo.bundle --all
 ```
 
