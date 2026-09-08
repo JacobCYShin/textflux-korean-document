@@ -147,6 +147,8 @@ def docker_create(
         "/output/result.png",
         "--steps",
         str(args.steps),
+        "--guidance-scale",
+        str(args.guidance_scale),
         "--seed",
         str(args.seed),
     ]
@@ -172,6 +174,8 @@ def execute_case(args: argparse.Namespace, case: dict[str, Any], source: Path, m
         "checkpoint_id": args.checkpoint_id,
         "model_root": str(args.model_root),
         "font": str(args.font),
+        "steps": args.steps,
+        "guidance_scale": args.guidance_scale,
         "network": "none",
         "style_reference_consumed": False,
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -231,6 +235,12 @@ def main() -> int:
     parser.add_argument("--model-root", type=Path)
     parser.add_argument("--seeds", default="42")
     parser.add_argument("--steps", type=int, default=30)
+    parser.add_argument(
+        "--guidance-scale",
+        type=float,
+        default=30.0,
+        help="FLUX guidance. Upstream defaults to 30.0; lower values loosen prompt adherence.",
+    )
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
@@ -240,6 +250,8 @@ def main() -> int:
         parser.error("--suite must contain lowercase letters, digits, and hyphens")
     if args.steps < 1:
         parser.error("--steps must be positive")
+    if args.guidance_scale <= 0:
+        parser.error("--guidance-scale must be positive")
 
     args.bundle = args.bundle.resolve()
     args.input_root = args.input_root.resolve()

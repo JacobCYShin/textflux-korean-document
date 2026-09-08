@@ -14,7 +14,7 @@ It infers style from the unmasked scene context. It has no supported command-lin
 
 A future handwriting-reference feature is not a font substitution or an inference-only flag. It requires a trained conditioning path with, at minimum:
 
-- an approved reference-image representation or encoder;
+- a reference-image representation or encoder;
 - a defined injection point into the diffusion model;
 - paired training data linking reference handwriting, target text, target document, and target mask;
 - an identity split so that reference writers in validation are not copied from training; and

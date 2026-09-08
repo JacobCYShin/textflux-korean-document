@@ -48,7 +48,3 @@ Use more seeds only after mask correctness is confirmed. Every output must retai
 | Text is exact but style is generic | Content is viable; style conditioning or style-domain adaptation is required. |
 | Text is wrong and style is wrong | Establish a Korean document adaptation baseline before adding style conditioning. |
 | Amount, account, SWIFT, date, or identifier differs by any character | Failure, regardless of visual quality. |
-
-## Before LoRA
-
-Do not choose a LoRA dataset size, rank, or training duration until this baseline is complete. If adaptation is needed, create a fixed validation set from this protocol and preserve it unchanged throughout training.
